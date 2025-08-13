@@ -21,4 +21,3 @@ pipeline:
       steps:
         - sh: |
             docker push $DOCKER_USER/$IMAGE_NAME:latest
-
