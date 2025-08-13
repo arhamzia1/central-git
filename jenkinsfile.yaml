@@ -1,0 +1,31 @@
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  imageName: 'my-docker-image'
+  dockerHubUser: 'your-dockerhub-username'
+
+steps:
+  - task: DockerInstaller@0
+    inputs:
+      dockerVersion: 'latest'
+
+  - script: |
+      echo "Building Docker image..."
+      docker build -t $(dockerHubUser)/$(imageName):latest .
+    displayName: 'Build Docker Image'
+
+  - script: |
+      echo "Logging into Docker Hub..."
+      echo "$(dockerHubPassword)" | docker login -u "$(dockerHubUser)" --password-stdin
+    env:
+      dockerHubPassword: $(DOCKER_HUB_PASSWORD)
+    displayName: 'Docker Login'
+
+  - script: |
+      echo "Pushing Docker image to repository..."
+      docker push $(dockerHubUser)/$(imageName):latest
+    displayName: 'Push Docker Image'
