@@ -1,31 +1,24 @@
-trigger:
-  - main
+pipeline:
+  agent:
+    label: "docker"
 
-pool:
-  vmImage: 'ubuntu-latest'
+  environment:
+    IMAGE_NAME: "my-docker-image"
+    DOCKER_USER: "your-dockerhub-username"
+    DOCKER_PASS: "${DOCKER_HUB_PASSWORD}"
 
-variables:
-  imageName: 'my-docker-image'
-  dockerHubUser: 'your-dockerhub-username'
+  stages:
+    - stage: Build Docker Image
+      steps:
+        - sh: |
+            echo "Building Docker image..."
+            docker build -t $DOCKER_USER/$IMAGE_NAME:latest .
+    - stage: Docker Login
+      steps:
+        - sh: |
+            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+    - stage: Push Docker Image
+      steps:
+        - sh: |
+            docker push $DOCKER_USER/$IMAGE_NAME:latest
 
-steps:
-  - task: DockerInstaller@0
-    inputs:
-      dockerVersion: 'latest'
-
-  - script: |
-      echo "Building Docker image..."
-      docker build -t $(dockerHubUser)/$(imageName):latest .
-    displayName: 'Build Docker Image'
-
-  - script: |
-      echo "Logging into Docker Hub..."
-      echo "$(dockerHubPassword)" | docker login -u "$(dockerHubUser)" --password-stdin
-    env:
-      dockerHubPassword: $(DOCKER_HUB_PASSWORD)
-    displayName: 'Docker Login'
-
-  - script: |
-      echo "Pushing Docker image to repository..."
-      docker push $(dockerHubUser)/$(imageName):latest
-    displayName: 'Push Docker Image'
