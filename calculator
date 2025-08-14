@@ -1,0 +1,14 @@
+// in c++
+
+#include "iostream"
+using namespace std;
+int main(){
+	int a,b;
+	cout<<"enter the first number";
+	cin>>a;
+	cout<<"enter the second number;
+	cin>>b;
+	cout<<"addition of these two numbers = " << a+b;
+	cout<<"subtraction of these two numbers = " << a-b;
+
+}
